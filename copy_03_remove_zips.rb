@@ -32,12 +32,15 @@ zips = %w(50044	Bussey	Marion County
 
 # csv = CSV.read('JasperCty-Owner-Seperated.csv', headers: :first_row, return_headers: true)
 csv = CSV.read('MarionCty- Seperated-CityStZip.csv', headers: :first_row, return_headers: true)
-csv.by_row!
+counter = 1
+
 csv.delete_if do |row|
   # binding.pry
   unless row.header_row?
     # binding.pry
     zipcode = (row.field('Zip').match?(/-/)) ? (row.field('Zip').split('-').first) : row.field('Zip')
+    counter += 1
+    puts counter
     zips.include?(zipcode)
   end
 end
