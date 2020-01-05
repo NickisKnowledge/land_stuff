@@ -23,7 +23,7 @@ require 'pry'
   "Market Value",
   "Property Size",
   "Short legal description",
-  "Tags"
+  "Tags"``
 ]
 
 @acronyms = ['LLC', 'LC', 'LLLP', 'LP', 'L/P', 'LLP', 'PRTSHP', 'PARTNER', 'LTD', 'INC','TRS', 'TR', 'IRA','CO', 'TRE']
@@ -34,14 +34,25 @@ def correct_capitalize_name(lname, fname, co=nil)
     split_name1_by = (lname.scan(/,/).any?) ? ', ' : ' '
     split_name2_by = (fname.scan(/,/).any?) ? ', ' : ' '
 
-    prop_lname = lname.downcase.split(split_name1_by).map do |str|
+    arr_lname = lname.downcase.split(split_name1_by).map do |str|
       #additional check for names w/slashes need property casing
-      str.match?(/\//) ? str.split('/').map(&:capitalize).join('/') : str.capitalize
-    end.join(' ')
+      if str.match?(/\//)
+        str.split('/').map(&:capitalize).join('/')
+      else
+        str.split.map(&:capitalize).join(' ')
+      end
+    end
 
-    prop_fname = fname.downcase.split(split_name2_by).map do |str|
-      str.match?(/\//) ? str.split('/').map(&:capitalize).join('/') : str.capitalize
-    end.join(' ')
+    arr_fname = fname.downcase.split(split_name2_by).map do |str|
+      if str.match?(/\//)
+        str.split('/').map(&:capitalize).join('/')
+      else
+        str.split.map(&:capitalize).join(' ')
+      end
+    end
+
+    prop_lname = split_name1_by.scan(/,/).any? ? arr_lname.join(', ') : arr_lname.join(' ')
+    prop_fname = split_name2_by.scan(/,/).any? ? arr_fname.join(', ') : arr_fname.join(' ')
 
     @new_row << prop_lname
     @new_row << prop_fname
@@ -49,7 +60,7 @@ def correct_capitalize_name(lname, fname, co=nil)
   else
     o_name = co.downcase.split
     o_name.map! do |str|
-      if str.upcase.match?(/(L L C)|(L P)|(L C)/) || @acronyms.include?(str.upcase)
+      if str.upcase.match?(/(L L C)|(L P)|(L C)|^ET$|^AL$/) || @acronyms.include?(str.upcase)
         str.upcase
       else
         str.capitalize
